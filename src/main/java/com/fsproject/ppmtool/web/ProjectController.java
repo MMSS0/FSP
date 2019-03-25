@@ -1,5 +1,7 @@
 package com.fsproject.ppmtool.web;
 
+import java.security.Principal;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class ProjectController
 	private ValidationErrorMapService validationErrorMapService;
 	
 	@PostMapping("")
-	public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result)
+	public ResponseEntity<?> createNewProject(@Valid @RequestBody Project project, BindingResult result, Principal principal)
 	{
 		ResponseEntity<?> errorMap = validationErrorMapService.ValidationService(result);
 		if(errorMap != null)
@@ -42,14 +44,14 @@ public class ProjectController
 			return errorMap;
 		}
 		
-		Project proj = projectService.saveOrUpdateProject(project);
+		Project proj = projectService.saveOrUpdateProject(project, principal.getName());
 		return new ResponseEntity<Project>(project, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/{projectId}")
-	public ResponseEntity<?> getProjectById(@PathVariable String projectId)
+	public ResponseEntity<?> getProjectById(@PathVariable String projectId, Principal principal)
 	{
-		Project project = projectService.findByProjectIdentifier(projectId.toUpperCase());
+		Project project = projectService.findByProjectIdentifier(projectId.toUpperCase(), principal.getName());
 		
 		if(project == null)
 		{
@@ -57,18 +59,19 @@ public class ProjectController
 		}
 		
 		return new ResponseEntity<Project>(project, HttpStatus.OK);
+//		return new ResponseEntity<Project>(projectService.findByProjectIdentifier(projectId, principal.getName()), HttpStatus.OK);
 	}
 	
 	@GetMapping("/all")
-	public Iterable<Project> findAllProjects()
+	public Iterable<Project> findAllProjects(Principal principal)
 	{
-		return projectService.findAllProjects();
+		return projectService.findAllProjects(principal.getName());
 	}
 	
 	@DeleteMapping("/{projectId}")
-	public ResponseEntity<?> deleteProjectById(@PathVariable String projectId)
+	public ResponseEntity<?> deleteProjectById(@PathVariable String projectId, Principal principal)
 	{
-		projectService.deleteProjectByIdentifier(projectId.toUpperCase());
+		projectService.deleteProjectByIdentifier(projectId, principal.getName());
 		
 		return new ResponseEntity<String>("Project with ID " + projectId.toUpperCase() + " was successfully deleted.", HttpStatus.OK);
 	}
