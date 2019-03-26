@@ -19,10 +19,10 @@ public class UserService
 	 
 	 public User saveUser(User newUser)
 	 {
-		 if(userRepository.findUserByUsername(newUser.getUsername()) != null)
-		 {
-			 throw new NonUniqueUsernameException("Username '" + newUser.getUsername() + "' already exists.");
-		 }
+//		 if(userRepository.findUserByUsername(newUser.getUsername()) != null)
+//		 {
+//			 throw new NonUniqueUsernameException("Username '" + newUser.getUsername() + "' already exists.");
+//		 }
 		 try
 		 {
 			 newUser.setPassword(bCrypt.encode(newUser.getPassword()));
